@@ -1,10 +1,10 @@
 // Import Packages
-import mongoose from "mongoose";
+import mongoose from "mongoose"; 
 import express from "express";
 import cookieParser from "cookie-parser";
 import cors from "cors";
 import bodyParser from "body-parser";
-import path from "path";
+import path from "path"; 
 import { fileURLToPath } from "url";
 
 import dotenv from "dotenv";
@@ -13,7 +13,7 @@ dotenv.config();
 
 
 // Import Routes
-import authRouter from "./src/routes/auth.route.js";
+import authRouter from "./src/routes/auth.route.js"; 
 
 
 const app = express();
