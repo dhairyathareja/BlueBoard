@@ -14,6 +14,7 @@ dotenv.config();
 
 // Import Routes
 import authRouter from "./src/routes/auth.route.js"; 
+import employeeRouter from "./src/routes/employee.route.js";
 
 
 const app = express();
@@ -31,6 +32,8 @@ app.use(cookieParser());
 
 // Routing APIs
 app.use('/auth',authRouter);
+app.use("/employee", employeeRouter);
+
 
 
 
