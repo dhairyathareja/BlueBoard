@@ -89,3 +89,115 @@ export const getEmployeeList = ErrorWrapper(async (req, res, next) => {
     }
 
 });
+
+
+export const getEmployeeDetails = ErrorWrapper(async(req, res, next)=>{
+    
+    const{id}=req.params;
+
+    try {
+        
+        const emp = await User.findById(id).select('-password');
+        
+        res.status(200).json({
+            success: true,
+            message: `Employee ${emp.name} details fetched successfully`,
+            empDetails:emp
+        })
+
+    } catch (error) {
+        throw new ErrorHandler(501, `Can't Fetch Employee Details, Contact Admin.`);
+    }
+
+})
+
+
+export const postUpdateEmployee = ErrorWrapper(async (req, res, next) => {
+
+    try {
+
+        const {employeeId, phone, department, designation, manager, role, status, onboardingStatus} = req.body;
+
+        const requiredField = ["employeeId", "department", "designation", "status", "onboardingStatus"];
+
+        const incomingField = Object.keys(req.body);
+
+        const missingField = requiredField.filter(
+            (field) => !incomingField.includes(field)
+        );
+
+        if (missingField.length > 0) {
+            throw new ErrorHandler(401,`Please Enter the Missing Fields: ${missingField.join(", ")} to Update Employee`);
+        }
+
+        const employee = await User.findOne({ employeeId });
+
+        if (!employee) {
+            throw new ErrorHandler(404, "Employee not found");
+        }
+
+        const updateUser = await User.findByIdAndUpdate(employee._id, {
+            phone,
+            department,
+            designation,
+            manager,
+            role,
+            status,
+            onboardingStatus,
+            updatedAt: new Date()
+
+        });
+        
+        res.status(200).json({
+            success: true,
+            message: `Employee ${employee.name} Updated Successfully`,
+            updateData:updateUser
+        });
+
+    } catch (error) {
+        throw new ErrorHandler(501, "Can't Update Employee. Please try later or Contact Admin");
+    }
+
+});
+
+
+export const postUpdateStatus = ErrorWrapper(async (req, res, next) => {
+
+    try {
+
+        const {employeeId, status} = req.body;
+
+        const requiredField = ["employeeId", "status"];
+
+        const incomingField = Object.keys(req.body);
+
+        const missingField = requiredField.filter(
+            (field) => !incomingField.includes(field)
+        );
+
+        if (missingField.length > 0) {
+            throw new ErrorHandler(401,`Please Enter the Missing Fields: ${missingField.join(", ")} to Update Employee`);
+        }
+
+        const employee = await User.findOne({ employeeId });
+
+        if (!employee) {
+            throw new ErrorHandler(404, "Employee not found");
+        }
+
+        const updatedUser = await User.findByIdAndUpdate(employee._id, 
+            {$set:{status:status}},
+            {new: true}
+        );
+        
+        res.status(200).json({
+            success: true,
+            message: `Employee ${employee.name} Updated Successfully`,
+            updateData:updatedUser
+        });
+
+    } catch (error) {
+        throw new ErrorHandler(501, "Can't Update Employee. Please try later or Contact Admin");
+    }
+
+});
