@@ -201,3 +201,83 @@ export const postUpdateStatus = ErrorWrapper(async (req, res, next) => {
     }
 
 });
+
+
+export const getDashboard = ErrorWrapper(async (req, res, next) => {
+
+    try {
+
+        const [
+            totalEmployee,
+            activeEmployee,
+            inactiveEmployee,
+            pendingEmployee,
+            completedOnboarding,
+            pendingOnboarding
+        ] = await Promise.all([
+
+            User.countDocuments({
+                isDeleted: false
+            }),
+
+            User.countDocuments({
+                status: "Active",
+                isDeleted: false
+            }),
+
+            User.countDocuments({
+                status: "Inactive",
+                isDeleted: false
+            }),
+
+            User.countDocuments({
+                status: "Pending",
+                isDeleted: false
+            }),
+
+            User.countDocuments({
+                onboardingStatus: "Completed",
+                isDeleted: false
+            }),
+
+            User.countDocuments({
+                onboardingStatus: {
+                    $ne: "Completed"
+                },
+                isDeleted: false
+            })
+
+        ]);
+
+        res.status(200).json({
+
+            success: true,
+
+            dashboard: {
+
+                totalEmployee,
+
+                activeEmployee,
+
+                inactiveEmployee,
+
+                pendingEmployee,
+
+                completedOnboarding,
+
+                pendingOnboarding
+
+            }
+
+        });
+
+    } catch (error) {
+
+        throw new ErrorHandler(
+            501,
+            "Can't Fetch Dashboard Data. Please try later."
+        );
+
+    }
+
+});
