@@ -10,6 +10,14 @@ const roleSchema = new mongoose.Schema(
             index: true,
         },
 
+        // AWS IAM Group Name
+        awsGroupName: {
+            type: String,
+            required: true,
+            trim: true,
+            unique: true,
+        },
+
         description: {
             type: String,
             trim: true,
@@ -30,5 +38,11 @@ const roleSchema = new mongoose.Schema(
         timestamps: true,
     }
 );
+
+// Optimized for listing active roles
+roleSchema.index({
+    isDeleted: 1,
+    createdAt: -1,
+});
 
 export const Role = mongoose.model("Role", roleSchema);

@@ -4,9 +4,19 @@ import ErrorWrapper from "../utils/ErrorWrapper.js";
 import { PERMISSIONS } from "../utils/permissions.js";
 
 export const postAddRole = ErrorWrapper(async (req, res, next) => {
-  const { roleName, description, permissions = [] } = req.body;
+  
+  const {
+      roleName,
+      awsGroupName,
+      description,
+      permissions = []
+  } = req.body;
 
-  const requiredField = ["roleName", "description"];
+  const requiredField = [
+      "roleName",
+      "awsGroupName",
+      "description"
+  ];
 
   const incomingField = Object.keys(req.body);
 
@@ -36,8 +46,11 @@ export const postAddRole = ErrorWrapper(async (req, res, next) => {
 
   try {
     const existingRole = await Role.exists({
-      roleName,
-      isDeleted: false,
+        $or: [
+            { roleName },
+            { awsGroupName }
+        ],
+        isDeleted: false
     });
 
     if (existingRole) {
@@ -45,9 +58,10 @@ export const postAddRole = ErrorWrapper(async (req, res, next) => {
     }
 
     const role = await Role.create({
-      roleName,
-      description,
-      permissions,
+        roleName,
+        awsGroupName,
+        description,
+        permissions
     });
 
     res.status(201).json({
@@ -106,55 +120,101 @@ export const getRoleList = ErrorWrapper(async (req, res, next) => {
 });
 
 export const postUpdateRole = ErrorWrapper(async (req, res, next) => {
-  const { roleId, description, permissions = [] } = req.body;
 
-  const requiredField = ["roleId", "description"];
+    const {
+        roleId,
+        awsGroupName,
+        description,
+        permissions = []
+    } = req.body;
 
-  const incomingField = Object.keys(req.body);
+    const requiredField = [
+        "roleId",
+        "awsGroupName",
+        "description"
+    ];
 
-  const missingField = requiredField.filter(
-    (field) => !incomingField.includes(field),
-  );
+    const incomingField = Object.keys(req.body);
 
-  if (missingField.length > 0) {
-    throw new ErrorHandler(
-      401,
-      `Please Enter the Missing Fields: ${missingField.join(", ")}`,
+    const missingField = requiredField.filter(
+        (field) => !incomingField.includes(field)
     );
-  }
 
-  const validPermissions = Object.values(PERMISSIONS);
-
-  const invalidPermissions = permissions.filter(
-    (permission) => !validPermissions.includes(permission),
-  );
-
-  if (invalidPermissions.length > 0) {
-    throw new ErrorHandler(
-      401,
-      `Invalid Permissions: ${invalidPermissions.join(", ")}`,
-    );
-  }
-
-  try {
-    const role = await Role.findById(roleId);
-
-    if (!role || role.isDeleted) {
-      throw new ErrorHandler(404, "Role not found");
+    if (missingField.length > 0) {
+        throw new ErrorHandler(
+            401,
+            `Please Enter the Missing Fields: ${missingField.join(", ")}`
+        );
     }
 
-    await Role.findByIdAndUpdate(roleId, {
-      description,
-      permissions,
-    });
+    const validPermissions = Object.values(PERMISSIONS);
 
-    res.status(200).json({
-      success: true,
-      message: `Role ${role.roleName} Updated Successfully`,
-    });
-  } catch (error) {
-    throw new ErrorHandler(501, "Can't Update Role. Please try again later.");
-  }
+    const invalidPermissions = permissions.filter(
+        (permission) => !validPermissions.includes(permission)
+    );
+
+    if (invalidPermissions.length > 0) {
+        throw new ErrorHandler(
+            401,
+            `Invalid Permissions: ${invalidPermissions.join(", ")}`
+        );
+    }
+
+    try {
+
+        const existingGroup = await Role.exists({
+            awsGroupName,
+            _id: { $ne: roleId },
+            isDeleted: false
+        });
+
+        if (existingGroup) {
+            throw new ErrorHandler(
+                401,
+                `AWS Group Name ${awsGroupName} already exists`
+            );
+        }
+
+        const role = await Role.findOneAndUpdate(
+            {
+                _id: roleId,
+                isDeleted: false
+            },
+            {
+                awsGroupName,
+                description,
+                permissions
+            },
+            {
+                new: true
+            }
+        );
+
+        if (!role) {
+            throw new ErrorHandler(
+                404,
+                "Role not found"
+            );
+        }
+
+        res.status(200).json({
+            success: true,
+            message: `Role ${role.roleName} Updated Successfully`
+        });
+
+    } catch (error) {
+
+        if (error instanceof ErrorHandler) {
+            throw error;
+        }
+
+        throw new ErrorHandler(
+            501,
+            "Can't Update Role. Please try again later."
+        );
+
+    }
+
 });
 
 export const postDeleteRole = ErrorWrapper(async (req, res, next) => {

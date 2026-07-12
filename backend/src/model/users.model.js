@@ -38,13 +38,13 @@ const userSchema = new Schema({
 
     role: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "Roles",
+        ref: "Role",
         default: null
     },
 
     awsProfile: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "awsProfile",
+        ref: "AwsProfile",
         default: null
     },
 
