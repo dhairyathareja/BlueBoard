@@ -1,10 +1,6 @@
 // Import Packages
 import "dotenv/config";
 
-// console.log(process.env.AWS_ACCESS_KEY_ID);
-// console.log(process.env.AWS_SECRET_ACCESS_KEY);
-// console.log(process.env.AWS_REGION);
-
 import mongoose from "mongoose"; 
 import express from "express";
 import cookieParser from "cookie-parser";
@@ -21,6 +17,7 @@ import authRouter from "./src/routes/auth.route.js";
 import employeeRouter from "./src/routes/employee.route.js";
 import roleRouter from "./src/routes/role.route.js";
 import awsRouter from "./src/routes/awsProfile.route.js";
+import documentRouter from "./src/routes/document.route.js";
 
 const app = express();
 
@@ -40,6 +37,7 @@ app.use('/auth',authRouter);
 app.use("/employee", employeeRouter);
 app.use("/role", roleRouter);
 app.use("/awsProfile", awsRouter);
+app.use("/document", documentRouter);
 
 
 

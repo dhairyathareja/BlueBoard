@@ -1,6 +1,6 @@
-import { IAMClient } from "@aws-sdk/client-iam";
+import { S3Client } from "@aws-sdk/client-s3";
 
-const iamClient = new IAMClient({
+const s3Client = new S3Client({
 
     region: process.env.AWS_REGION,
 
@@ -14,4 +14,4 @@ const iamClient = new IAMClient({
 
 });
 
-export default iamClient;
+export default s3Client;
