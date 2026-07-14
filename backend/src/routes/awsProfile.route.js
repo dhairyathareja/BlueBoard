@@ -1,18 +1,15 @@
 import express from "express";
-import { postProvisionAWSAccess } from "../controller/awsProfile.controller.js";
+import { getAWSProfileList, postDisableAWSAccess, postProvisionAWSAccess, postResetAWSPassword } from "../controller/awsProfile.controller.js";
 
 const router = express.Router();
 
 
-router.post(
-    "/provisionAccess",
-    postProvisionAWSAccess
-);
+router.post("/provisionAccess", postProvisionAWSAccess);
 
-// router.get("/list", getAWSProfileList);
+router.get("/list", getAWSProfileList);
 
-// router.patch("/update", postUpdateAWSProfile);
+router.patch("/resetPassword", postResetAWSPassword);
 
-// router.patch("/delete", postDeleteAWSProfile);
+router.patch("/disableAccess", postDisableAWSAccess);
 
 export default router

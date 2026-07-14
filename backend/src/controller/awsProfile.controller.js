@@ -4,7 +4,8 @@ import {
     AddUserToGroupCommand,
     RemoveUserFromGroupCommand,
     DeleteLoginProfileCommand,
-    DeleteUserCommand
+    DeleteUserCommand,
+    UpdateLoginProfileCommand
 } from "@aws-sdk/client-iam";
 
 import iamClient from "../config/aws.config.js";
@@ -254,6 +255,280 @@ export const postProvisionAWSAccess = ErrorWrapper(async (req, res, next) => {
                 500,
                 "AWS Provisioning Failed."
             );
+
+    }
+
+});
+
+
+export const getAWSProfileList = ErrorWrapper(async (req, res, next) => {
+
+    let {
+        page = 1,
+        limit = 10,
+        region,
+        status,
+        search
+    } = req.query;
+
+    page = Number(page);
+    limit = Number(limit);
+
+    let filter = {
+        isDeleted: false
+    };
+
+    if (region) {
+
+        filter.region = region;
+
+    }
+
+    if (status) {
+
+        filter.status = status;
+
+    }
+
+    if (search) {
+
+        filter.iamUserName = {
+            $regex: search,
+            $options: "i"
+        };
+
+    }
+
+    try {
+
+        const [totalProfiles, awsProfiles] = await Promise.all([
+
+            AwsProfile.countDocuments(filter),
+
+            AwsProfile.find(filter)
+                .populate(
+                    "employee",
+                    "employeeId name email department designation"
+                )
+                .sort({
+                    createdAt: -1
+                })
+                .skip((page - 1) * limit)
+                .limit(limit)
+                .lean()
+
+        ]);
+
+        res.status(200).json({
+
+            success: true,
+
+            currentPage: page,
+
+            totalPages: Math.ceil(totalProfiles / limit),
+
+            totalProfiles,
+
+            awsProfiles
+
+        });
+
+    } catch (error) {
+
+        throw new ErrorHandler(
+            501,
+            "Can't Fetch AWS Profiles. Please try again later."
+        );
+
+    }
+
+});
+
+
+export const postResetAWSPassword = ErrorWrapper(async (req, res, next) => {
+
+    const { awsProfileId } = req.body;
+
+    const requiredField = [
+        "awsProfileId"
+    ];
+
+    const incomingField = Object.keys(req.body);
+
+    const missingField = requiredField.filter(
+        field => !incomingField.includes(field)
+    );
+
+    if (missingField.length > 0) {
+
+        throw new ErrorHandler(
+            401,
+            `Please Enter the Missing Fields: ${missingField.join(", ")}`
+        );
+
+    }
+
+    try {
+
+        const awsProfile = await AwsProfile.findOne({
+
+            _id: awsProfileId,
+
+            isDeleted: false
+
+        });
+
+        if (!awsProfile) {
+
+            throw new ErrorHandler(
+                404,
+                "AWS Profile not found"
+            );
+
+        }
+
+        const temporaryPassword = generatePassword();
+
+        await iamClient.send(
+
+            new UpdateLoginProfileCommand({
+
+                UserName: awsProfile.iamUserName,
+
+                Password: temporaryPassword,
+
+                PasswordResetRequired: true
+
+            })
+
+        );
+
+        res.status(200).json({
+
+            success: true,
+
+            message: "Password Reset Successfully",
+
+            credentials: {
+
+                iamUserName: awsProfile.iamUserName,
+
+                temporaryPassword
+
+            }
+
+        });
+
+    } catch (error) {
+        
+        if (error instanceof ErrorHandler) {
+
+            throw error;
+
+        }
+
+        throw new ErrorHandler(
+
+            501,
+
+            "Can't Reset AWS Password"
+
+        );
+
+    }
+
+});
+
+
+export const postDisableAWSAccess = ErrorWrapper(async (req, res, next) => {
+
+    const { awsProfileId } = req.body;
+
+    const requiredField = [
+        "awsProfileId"
+    ];
+
+    const incomingField = Object.keys(req.body);
+
+    const missingField = requiredField.filter(
+        field => !incomingField.includes(field)
+    );
+
+    if (missingField.length > 0) {
+
+        throw new ErrorHandler(
+            401,
+            `Please Enter the Missing Fields: ${missingField.join(", ")}`
+        );
+
+    }
+
+    try {
+
+        const awsProfile = await AwsProfile.findOne({
+
+            _id: awsProfileId,
+
+            isDeleted: false
+
+        });
+
+        if (!awsProfile) {
+
+            throw new ErrorHandler(
+                404,
+                "AWS Profile not found"
+            );
+
+        }
+
+        await iamClient.send(
+
+            new RemoveUserFromGroupCommand({
+
+                GroupName: awsProfile.iamGroup,
+
+                UserName: awsProfile.iamUserName
+
+            })
+
+        );
+
+        await AwsProfile.findByIdAndUpdate(
+
+            awsProfileId,
+
+            {
+
+                status: "Disabled"
+
+            }
+
+        );
+
+        res.status(200).json({
+
+            success: true,
+
+            message: "AWS Access Disabled Successfully"
+
+        });
+
+    } catch (error) {
+
+        if (error instanceof ErrorHandler) {
+
+            throw error;
+
+        }
+
+        throw new ErrorHandler(
+
+            501,
+
+            "Can't Disable AWS Access"
+
+        );
 
     }
 
