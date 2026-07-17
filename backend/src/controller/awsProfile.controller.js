@@ -21,9 +21,7 @@ export const postProvisionAWSAccess = ErrorWrapper(async (req, res, next) => {
 
     const { employeeId } = req.body;
 
-    const requiredField = [
-        "employeeId"
-    ];
+    const requiredField = ["employeeId"];
 
     const incomingField = Object.keys(req.body);
 
@@ -32,59 +30,33 @@ export const postProvisionAWSAccess = ErrorWrapper(async (req, res, next) => {
     );
 
     if (missingField.length > 0) {
-
-        throw new ErrorHandler(
-            401,
-            `Please Enter the Missing Fields: ${missingField.join(", ")}`
-        );
-
+        throw new ErrorHandler(401,`Please Enter the Missing Fields: ${missingField.join(", ")}`);
     }
 
     try {
 
         const employee = await User.findOne({
-
             employeeId,
-
             isDeleted: false
-
         })
         .populate("role", "roleName awsGroupName")
         .select("-password");
 
         if (!employee) {
-
-            throw new ErrorHandler(
-                404,
-                "Employee not found"
-            );
-
+            throw new ErrorHandler(404,"Employee not found");
         }
 
         if (!employee.role) {
-
-            throw new ErrorHandler(
-                401,
-                "Assign Employee Role before provisioning AWS Access"
-            );
-
+            throw new ErrorHandler(401,"Assign Employee Role before provisioning AWS Access");
         }
 
         const existingProfile = await AwsProfile.exists({
-
             employee: employee._id,
-
             isDeleted: false
-
         });
 
         if (existingProfile) {
-
-            throw new ErrorHandler(
-                401,
-                "AWS Access already provisioned"
-            );
-
+            throw new ErrorHandler(401,"AWS Access already provisioned");
         }
 
         const iamGroup = employee.role.awsGroupName;
@@ -93,29 +65,22 @@ export const postProvisionAWSAccess = ErrorWrapper(async (req, res, next) => {
 
         const temporaryPassword = generatePassword();
 
-        const consoleUrl =
-            `https://${process.env.AWS_ACCOUNT_ID}.signin.aws.amazon.com/console`;
+        const consoleUrl = `https://${process.env.AWS_ACCOUNT_ID}.signin.aws.amazon.com/console`;
 
-                // Create IAM User
-
+        // Create IAM User
         const createUserCommand = new CreateUserCommand({
-
-            UserName: iamUserName
-
+            UserName: iamUserName,
+            Path: "/blueboard/employees/"
         });
-
+        
         await iamClient.send(createUserCommand);
 
         // Create Login Profile (Temporary Password)
 
         const createLoginProfileCommand = new CreateLoginProfileCommand({
-
             UserName: iamUserName,
-
             Password: temporaryPassword,
-
             PasswordResetRequired: true
-
         });
 
         await iamClient.send(createLoginProfileCommand);
@@ -123,35 +88,24 @@ export const postProvisionAWSAccess = ErrorWrapper(async (req, res, next) => {
         // Add User to IAM Group
 
         const addUserToGroupCommand = new AddUserToGroupCommand({
-
             GroupName: iamGroup,
-
             UserName: iamUserName
-
         });
 
         await iamClient.send(addUserToGroupCommand);
 
-                // Save AWS Profile in MongoDB
+        // Save AWS Profile in MongoDB
 
         try {
 
             const awsProfile = await AwsProfile.create({
-
                 employee: employee._id,
-
                 awsAccountId: process.env.AWS_ACCOUNT_ID,
-
                 iamUserName,
-
                 iamGroup,
-
                 region: process.env.AWS_REGION,
-
                 consoleUrl,
-
                 status: "Active"
-
             });
 
             employee.awsProfile = awsProfile._id;
@@ -161,77 +115,48 @@ export const postProvisionAWSAccess = ErrorWrapper(async (req, res, next) => {
         } catch (dbError) {
 
             // Rollback if MongoDB save fails
-
             try {
-
                 await iamClient.send(
                     new RemoveUserFromGroupCommand({
-
                         GroupName: iamGroup,
-
                         UserName: iamUserName
-
                     })
                 );
 
                 await iamClient.send(
                     new DeleteLoginProfileCommand({
-
                         UserName: iamUserName
-
                     })
                 );
 
                 await iamClient.send(
                     new DeleteUserCommand({
-
                         UserName: iamUserName
-
                     })
                 );
 
-            } catch (rollbackError) {
-
-                console.log("Rollback Failed :", rollbackError);
-
+            } catch (error) {
+              throw new ErrorHandler(500,"AWS User Created but MongoDB Save Failed");
             }
 
-            throw new ErrorHandler(
-                500,
-                "AWS User Created but MongoDB Save Failed"
-            );
+            
 
         }
 
         res.status(200).json({
-
             success: true,
-
             message: "AWS Access Provisioned Successfully",
-
             credentials: {
-
                 iamUserName,
-
                 temporaryPassword,
-
                 consoleUrl,
-
                 iamGroup,
-
                 region: process.env.AWS_REGION
-
             }
 
         });
 
         } catch (error) {
-
-            console.log(error);
-
-            if (error instanceof ErrorHandler) {
-                throw error;
-            }
 
             if (error.name === "EntityAlreadyExistsException") {
 

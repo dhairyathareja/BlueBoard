@@ -160,7 +160,7 @@ export const loginEmployee=ErrorWrapper(async(req,res,next)=>{
 
     const {accessToken,refreshToken}= await generateAccessAndRefreshToken(user._id);
     user.refreshToken=refreshToken
-    await user.save()
+    await user.save({validateBeforeSave: false});
 
     res.status(200)
         .cookie("RefreshToken",refreshToken)

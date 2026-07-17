@@ -19,6 +19,9 @@ import roleRouter from "./src/routes/role.route.js";
 import awsRouter from "./src/routes/awsProfile.route.js";
 import documentRouter from "./src/routes/document.route.js";
 
+// Import JWT Verification
+import { verifyjwt } from "./src/middleware/verifyJWT.js";
+
 const app = express();
 
 app.use(cors({
@@ -34,10 +37,10 @@ app.use(cookieParser());
 
 // Routing APIs
 app.use('/auth',authRouter);
-app.use("/employee", employeeRouter);
-app.use("/role", roleRouter);
-app.use("/awsProfile", awsRouter);
-app.use("/document", documentRouter);
+app.use("/employee", verifyjwt, employeeRouter);
+app.use("/role", verifyjwt, roleRouter);
+app.use("/awsProfile", verifyjwt, awsRouter);
+app.use("/document", verifyjwt, documentRouter);
 
 
 

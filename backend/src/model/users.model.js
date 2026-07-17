@@ -32,6 +32,11 @@ const userSchema = new Schema({
         trim: true,
     },
 
+    refreshToken: {
+        type: String,
+        default: null,
+    },
+
     phone: {
         type: Number,
     },
