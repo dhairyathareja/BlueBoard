@@ -201,7 +201,12 @@ export const postLogout=ErrorWrapper(async(req,res,next)=>{
 export const getProfileInfo=ErrorWrapper(async (req,res,next) => {
 
     const{userId}=req.params;
-    let user=await User.findOne({_id:userId}).select('-password');
+    
+    const user = await User.findById(userId)
+    .populate("role")
+    .populate("awsProfile")
+    .select("-password -refreshToken");
+    
     if(!user){
         throw new ErrorHandler(401,`User Does not Exist`);
     }

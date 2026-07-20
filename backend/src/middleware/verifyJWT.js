@@ -30,14 +30,11 @@ export const verifyjwt = ErrorWrapper(async (req, res, next) => {
 
     try {
 
-        console.log("Cookies:", req.cookies);
-
+        
         const incomingAccessToken = req.cookies.AccessToken;
         const incomingRefreshToken = req.cookies.RefreshToken;
 
-        console.log("Access Token:", incomingAccessToken);
-        console.log("Refresh Token:", incomingRefreshToken);
-
+        
         if (!incomingAccessToken || !incomingRefreshToken) {
             throw new ErrorHandler(
                 401,
@@ -50,12 +47,10 @@ export const verifyjwt = ErrorWrapper(async (req, res, next) => {
             process.env.ACCESS_TOKEN_KEY
         );
 
-        console.log("Decoded Token:", userInfo);
-
+        
         const user = await User.findById(userInfo.userId);
 
-        console.log("DB User:", user);
-
+        
         if (!user) {
             throw new ErrorHandler(
                 401,
@@ -63,9 +58,7 @@ export const verifyjwt = ErrorWrapper(async (req, res, next) => {
             );
         }
 
-        console.log("DB Refresh:", user.refreshToken);
-        console.log("Cookie Refresh:", incomingRefreshToken);
-
+        
         if (user.refreshToken !== incomingRefreshToken) {
             throw new ErrorHandler(
                 401,
@@ -79,8 +72,7 @@ export const verifyjwt = ErrorWrapper(async (req, res, next) => {
 
     } catch (error) {
 
-        console.log(error);
-
+        
         throw error;
 
     }

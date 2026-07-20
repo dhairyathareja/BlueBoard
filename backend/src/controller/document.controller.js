@@ -107,8 +107,7 @@ export const postUploadDocument = ErrorWrapper(async(req,res,next)=>{
     }
     catch(error){
 
-        console.log(error.message);
-
+        
         if(error instanceof ErrorHandler){
 
             throw error;

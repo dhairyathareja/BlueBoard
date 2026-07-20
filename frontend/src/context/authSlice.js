@@ -31,7 +31,7 @@ export const loginUser = createAsyncThunk(
       if (!user) {
         const profileRes = await authService.getProfile(userId);
         user = profileRes.user;
-        console.log(user);
+        
       }
       
       localStorage.setItem('bb_user', JSON.stringify(user));

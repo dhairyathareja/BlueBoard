@@ -9,7 +9,7 @@ const ProgressStepper = ({ employee }) => {
     { label: 'AWS Provisioned', icon: FiCloud },
     { label: 'Company Documents Uploaded', icon: FiFileText },
     { label: 'Employee Documents Uploaded', icon: FiFileText },
-    { label: 'Credentials Sent', icon: FiSend }
+    { label: 'Documents Verified', icon: FiSend }
   ];
 
   // Derive active steps

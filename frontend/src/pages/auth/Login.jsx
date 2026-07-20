@@ -183,24 +183,7 @@ const Login = () => {
               )}
             </button>
           </form>
-
-          {/* Seed Data Tip */}
-          <div style={{
-            marginTop: '24px',
-            padding: '12px',
-            borderRadius: '8px',
-            background: 'rgba(255, 255, 255, 0.02)',
-            border: '1px solid var(--border-color)',
-            fontSize: '0.75rem',
-            color: 'var(--text-muted)',
-            textAlign: 'left'
-          }}>
-            <span style={{ fontWeight: 600, color: 'var(--text-secondary)', display: 'block', marginBottom: '4px' }}>
-              ℹ️ Demo Credentials
-            </span>
-            HR Manager: hr@blueboard.com / Admin123<br />
-            Employee: employee@blueboard.com / Employee123
-          </div>
+        
         </div>
       </motion.div>
     </div>
