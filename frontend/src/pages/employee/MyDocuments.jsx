@@ -49,6 +49,17 @@ const MyDocuments = () => {
     fetchProfileAndDocs();
   }, [user]);
 
+  // Handle Document Download
+  const handleDownload = async (documentId) => {
+    try {
+      const res = await documentService.download(documentId);
+
+      window.open(res.downloadUrl, "_blank");
+    } catch (err) {
+      alert(err.message || "Failed to download document.");
+    }
+  };
+
   const handleUploadSubmit = async (e) => {
     e.preventDefault();
     if (!selectedFile) {
@@ -144,16 +155,16 @@ const MyDocuments = () => {
       key: 'actions',
       render: (row) => (
         <div style={{ display: 'flex', gap: '8px' }}>
-          <a
-            href={row.fileUrl}
-            target="_blank"
-            rel="noopener noreferrer"
+          
+          <button
+            onClick={() => handleDownload(row._id)}
             className="btn btn-secondary"
             style={{ padding: '6px 10px', height: '32px' }}
-            title="Download file"
+            title="Download Document"
           >
             <FiDownload size={14} />
-          </a>
+          </button>
+          
           <button
             onClick={() => handleDeleteDoc(row._id)}
             className="btn btn-secondary"
@@ -203,16 +214,26 @@ const MyDocuments = () => {
             header: 'Actions',
             key: 'downloadOnly',
             render: (row) => (
-              <a
-                href={row.fileUrl}
-                target="_blank"
-                rel="noopener noreferrer"
+              // <a
+              //   href={row.fileUrl}
+              //   target="_blank"
+              //   rel="noopener noreferrer"
+              //   className="btn btn-secondary"
+              //   style={{ padding: '6px 10px', height: '32px' }}
+              //   title="Download company document"
+              // >
+              //   <FiDownload size={14} />
+              // </a>
+              
+              <button
+                onClick={() => handleDownload(row._id)}
                 className="btn btn-secondary"
                 style={{ padding: '6px 10px', height: '32px' }}
-                title="Download company document"
+                title="Download Document"
               >
                 <FiDownload size={14} />
-              </a>
+              </button>
+
             )
           })}
           data={companyDocuments}

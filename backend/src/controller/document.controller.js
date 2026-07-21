@@ -3,8 +3,9 @@ import ErrorHandler from "../utils/ErrorHandler.js";
 import { Document } from "../model/document.model.js";
 import User from "../model/users.model.js";
 import uploadToS3 from '../utils/s3Upload.js'
-import { DeleteObjectCommand } from "@aws-sdk/client-s3";
+import { DeleteObjectCommand, GetObjectCommand } from "@aws-sdk/client-s3";
 import { PutObjectCommand } from "@aws-sdk/client-s3";
+import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import s3Client from "../config/s3.config.js";
 import DOCUMENT_TYPES from "../utils/documentTypes.js";
 
@@ -472,5 +473,43 @@ export const postDeleteDocument = ErrorWrapper(async(req,res,next)=>{
         );
 
     }
+
+});
+
+
+export const getDownloadDocument = ErrorWrapper(async (req, res) => {
+
+    const { documentId } = req.params;
+
+    const document = await Document.findOne({
+        _id: documentId,
+        isDeleted: false
+    });
+
+    if (!document) {
+        throw new ErrorHandler(404,"Document not found");
+    }
+
+    console.log(process.env.AWS_BUCKET_NAME);
+console.log(document.s3Key);
+console.log(s3Client);
+
+    const command = new GetObjectCommand({
+        Bucket: process.env.AWS_BUCKET_NAME,
+        Key: document.s3Key
+    });
+
+    const downloadUrl = await getSignedUrl(
+        s3Client,
+        command,
+        {
+            expiresIn: 300
+        }
+    );
+
+    res.status(200).json({
+        success: true,
+        downloadUrl
+    });
 
 });

@@ -106,15 +106,69 @@ const HRDashboard = () => {
     value: onboardCounts[obs]
   }));
 
-  // Mock trend data for Onboarding completion rates
-  const timelineData = [
-    { month: 'Jan', completed: 2, pending: 4 },
-    { month: 'Feb', completed: 5, pending: 3 },
-    { month: 'Mar', completed: 8, pending: 6 },
-    { month: 'Apr', completed: 12, pending: 5 },
-    { month: 'May', completed: 18, pending: 8 },
-    { month: 'Jun', completed: employees.filter(e => e.onboardingStatus === 'Completed').length, pending: employees.filter(e => e.onboardingStatus !== 'Completed').length }
-  ];
+  
+  // ================= Employee Onboarding Trend =================
+
+  const sortedEmployees = [...employees].sort(
+      (a, b) => new Date(a.createdAt) - new Date(b.createdAt)
+  );
+
+  const dailyData = {};
+
+  sortedEmployees.forEach(employee => {
+
+      const date = new Date(employee.createdAt);
+
+      const day = date.toLocaleDateString("en-GB", {
+          day: "2-digit",
+          month: "short"
+      });
+
+      if (!dailyData[day]) {
+
+          dailyData[day] = {
+              day,
+              completed: 0,
+              pending: 0
+          };
+
+      }
+
+      if (employee.onboardingStatus === "Completed") {
+
+          dailyData[day].completed++;
+
+      } else {
+
+          dailyData[day].pending++;
+
+      }
+
+  });
+
+  const timelineData = [];
+
+  let completedTotal = 0;
+  let pendingTotal = 0;
+
+  Object.values(dailyData).forEach(item => {
+
+      completedTotal += item.completed;
+      pendingTotal += item.pending;
+
+      timelineData.push({
+
+          day: item.day,
+
+          completed: completedTotal,
+
+          pending: pendingTotal
+
+      });
+
+  });
+
+
 
   return (
     <div style={{ padding: '32px', position: 'relative' }}>
@@ -284,7 +338,12 @@ const HRDashboard = () => {
                     <stop offset="95%" stopColor="var(--primary)" stopOpacity={0}/>
                   </linearGradient>
                 </defs>
-                <XAxis dataKey="month" stroke="var(--text-muted)" fontSize={11} tickLine={false} />
+                <XAxis
+                    dataKey="day"
+                    stroke="var(--text-muted)"
+                    fontSize={11}
+                    tickLine={false}
+                />
                 <YAxis stroke="var(--text-muted)" fontSize={11} tickLine={false} />
                 <Tooltip
                   contentStyle={{

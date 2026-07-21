@@ -54,6 +54,18 @@ const DocumentsList = () => {
     return () => clearTimeout(delayDebounceFn);
   }, [search]);
 
+  // Handle Document Download
+  const handleDownload = async (documentId) => {
+    try {
+      const res = await documentService.download(documentId);
+
+      window.open(res.downloadUrl, "_blank");
+    } catch (err) {
+      alert(err.message || "Failed to download document.");
+    }
+  };
+
+  // Handle delete Documents
   const handleDeleteDoc = async (docId) => {
     if (!window.confirm('Are you sure you want to delete this document? This action is permanent.')) return;
     setLoading(true);
@@ -120,16 +132,16 @@ const DocumentsList = () => {
       key: 'actions',
       render: (row) => (
         <div style={{ display: 'flex', gap: '8px' }}>
-          <a
-            href={row.fileUrl}
-            target="_blank"
-            rel="noopener noreferrer"
+          
+          <button
+            onClick={() => handleDownload(row._id)}
             className="btn btn-secondary"
             style={{ padding: '6px 10px', height: '32px' }}
             title="Download Document"
           >
             <FiDownload size={14} />
-          </a>
+          </button>
+          
           <button
             onClick={() => handleDeleteDoc(row._id)}
             className="btn btn-secondary"

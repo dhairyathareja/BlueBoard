@@ -17,6 +17,10 @@ const documentService = {
     const response = await api.get(`/document/employee/${employeeId}`);
     return response.data;
   },
+  download: async (documentId) => {
+    const response = await api.get(`/document/download/${documentId}`);
+    return response.data;
+  },
   update: async (formData) => {
     const response = await api.patch('/document/update', formData, {
       headers: {
