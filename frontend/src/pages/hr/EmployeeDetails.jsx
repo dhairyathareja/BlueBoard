@@ -135,6 +135,17 @@ const EmployeeDetails = () => {
     }
   };
 
+  // Handle Document Download
+  const handleDownload = async (documentId) => {
+    try {
+      const res = await documentService.download(documentId);
+
+      window.open(res.downloadUrl, "_blank");
+    } catch (err) {
+      alert(err.message || "Failed to download document.");
+    }
+  };
+
   const handleDeleteDoc = async (docId) => {
     if (!window.confirm('Are you sure you want to delete this document? This action is permanent.')) return;
     
@@ -353,16 +364,16 @@ const EmployeeDetails = () => {
                     <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{doc.fileName} ({Math.round(doc.fileSize / 1024)} KB)</span>
                   </div>
                   <div style={{ display: 'flex', gap: '8px' }}>
-                    <a
-                      href={doc.fileUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
+                    
+                    <button
+                      onClick={() => handleDownload(doc._id)}
                       className="btn btn-secondary"
                       style={{ padding: '6px 10px', height: '32px' }}
                       title="Download Document"
                     >
                       <FiDownload size={14} />
-                    </a>
+                    </button>
+
                     <button
                       onClick={() => handleDeleteDoc(doc._id)}
                       className="btn btn-secondary"
@@ -445,14 +456,22 @@ const EmployeeDetails = () => {
         {employeeDocuments.length > 0 ? (
           <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
             {employeeDocuments.map((doc) => (
+              
               <div key={doc._id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '14px 18px', background: 'rgba(0,0,0,0.15)', borderRadius: '10px', border: '1px solid var(--border-color)' }}>
                 <div>
                   <span style={{ fontSize: '0.9rem', fontWeight: 600, color: 'var(--text-primary)', display: 'block' }}>{doc.documentType}</span>
                   <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{doc.fileName} ({Math.round(doc.fileSize / 1024)} KB)</span>
                 </div>
-                <a href={doc.fileUrl} target="_blank" rel="noopener noreferrer" className="btn btn-secondary" style={{ padding: '6px 10px', height: '32px' }} title="Download employee document">
-                  <FiDownload size={14} />
-                </a>
+                <span></span>
+                <button
+                onClick={() => handleDownload(doc._id)}
+                className="btn btn-secondary"
+                style={{ padding: '6px 10px', height: '32px' }}
+                title="Download Document"
+              >
+                <FiDownload size={14} />
+              </button>
+            
               </div>
             ))}
           </div>

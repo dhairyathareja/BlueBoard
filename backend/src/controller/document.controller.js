@@ -490,10 +490,7 @@ export const getDownloadDocument = ErrorWrapper(async (req, res) => {
         throw new ErrorHandler(404,"Document not found");
     }
 
-    console.log(process.env.AWS_BUCKET_NAME);
-console.log(document.s3Key);
-console.log(s3Client);
-
+    
     const command = new GetObjectCommand({
         Bucket: process.env.AWS_BUCKET_NAME,
         Key: document.s3Key

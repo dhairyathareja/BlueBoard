@@ -323,7 +323,7 @@ const HRDashboard = () => {
         {/* Onboarding Progress Trend (Area Chart) */}
         <div className="glass-card" style={{ padding: '24px', minHeight: '380px', gridColumn: 'span 2' }}>
           <h3 style={{ fontSize: '1rem', fontWeight: 600, color: 'var(--text-primary)', marginBottom: '20px', fontFamily: 'var(--font-display)' }}>
-            Onboarding Completion Pipeline
+            Employee Onboarding Trend
           </h3>
           <div style={{ width: '100%', height: '280px' }}>
             <ResponsiveContainer width="100%" height="100%">
