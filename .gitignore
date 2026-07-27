@@ -34,7 +34,12 @@ terraform.tfstate.backup
 .terraform.lock.hcl
 *.tfplan
 
+# Production
+.env.production
 
-# Teraform Files
-bucket-policy.tf
-cloudfront.tf
+# Docker
+node_modules
+logs
+
+# Docker Compose
+docker-compose.override.yml

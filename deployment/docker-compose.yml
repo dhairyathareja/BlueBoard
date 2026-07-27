@@ -1,0 +1,28 @@
+version: "3.9"
+
+services:
+
+  blueboard-backend:
+
+    container_name: blueboard-backend
+
+    build:
+      context: ../backend
+
+    image: blueboard-backend
+
+    restart: unless-stopped
+
+    env_file:
+      - ../backend/.env.production
+
+    ports:
+      - "127.0.0.1:5000:5000"
+
+    networks:
+      - blueboard-network
+
+networks:
+
+  blueboard-network:
+    driver: bridge

@@ -25,7 +25,10 @@ import { verifyjwt } from "./src/middleware/verifyJWT.js";
 const app = express();
 
 app.use(cors({
-    origin: ['http://localhost:5173', 'http://127.0.0.1:5173'],
+    origin: process.env.CORS_ORIGINS ? process.env.CORS_ORIGINS.split(",") : [
+        "http://localhost:5173",
+        "http://127.0.0.1:5173"
+    ],
     credentials: true
 }));
 
