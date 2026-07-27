@@ -26,3 +26,15 @@ dist-ssr
 *.sln
 *.sw?
 
+# Deplopyment Variables
+.aws/
+.terraform/
+terraform.tfstate
+terraform.tfstate.backup
+.terraform.lock.hcl
+*.tfplan
+
+
+# Teraform Files
+bucket-policy.tf
+cloudfront.tf
