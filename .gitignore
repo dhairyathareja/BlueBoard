@@ -35,7 +35,7 @@ terraform.tfstate.backup
 *.tfplan
 
 # Production
-.env.production
+*.env.production
 
 # Docker
 node_modules
