@@ -28,12 +28,8 @@ import User from "../model/users.model.js";
 
 export const verifyjwt = ErrorWrapper(async (req, res, next) => {
 
-    console.log("Cookies:", req.cookies);
-    console.log("Raw Cookie Header:", req.headers.cookie);
-
     try {
-
-        
+                
         const incomingAccessToken = req.cookies.AccessToken;
         const incomingRefreshToken = req.cookies.RefreshToken;
 

@@ -5,6 +5,7 @@ import { PERMISSIONS } from "../utils/permissions.js";
 
 export const postAddRole = ErrorWrapper(async (req, res, next) => {
   
+ 
   const {
       roleName,
       awsGroupName,
@@ -69,6 +70,7 @@ export const postAddRole = ErrorWrapper(async (req, res, next) => {
       message: `Role ${role.roleName} Added Successfully`,
     });
   } catch (error) {
+
     throw new ErrorHandler(501, "Can't Add Role. Please try again later.");
   }
 });
