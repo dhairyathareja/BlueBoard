@@ -23,7 +23,7 @@ const generateAccessAndRefreshToken=async(userId)=>{
 const cookieOptions = {
     httpOnly: true,
     secure: true,
-    sameSite: "None",
+    sameSite: "none",
     path: "/"
 };
 
