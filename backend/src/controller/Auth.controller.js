@@ -168,6 +168,7 @@ export const loginEmployee=ErrorWrapper(async(req,res,next)=>{
         .json({
             success:true,
             message:`User ${user.name} login Successfully`,
+            data: user
         })
 })
 
