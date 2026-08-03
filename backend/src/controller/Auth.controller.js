@@ -20,7 +20,12 @@ const generateAccessAndRefreshToken=async(userId)=>{
     }
 }
 
-
+const cookieOptions = {
+    httpOnly: true,
+    secure: true,
+    sameSite: "None",
+    path: "/"
+};
 
 export const addEmployee = ErrorWrapper(async (req, res, next) => {
 
@@ -163,13 +168,13 @@ export const loginEmployee=ErrorWrapper(async(req,res,next)=>{
     await user.save({validateBeforeSave: false});
 
     res.status(200)
-        .cookie("RefreshToken",refreshToken)
-        .cookie("AccessToken",accessToken)
-        .json({
-            success:true,
-            message:`User ${user.name} login Successfully`,
-            user
-        })
+    .cookie("RefreshToken", refreshToken, cookieOptions)
+    .cookie("AccessToken", accessToken, cookieOptions)
+    .json({
+        success: true,
+        message: `User ${user.name} login Successfully`,
+        user
+    });
 })
 
 
@@ -185,12 +190,12 @@ export const postLogout=ErrorWrapper(async(req,res,next)=>{
         await user.save();       
 
         res.status(200)
-        .cookie("RefreshToken","")
-        .cookie("AccessToken","")
+        .clearCookie("RefreshToken", cookieOptions)
+        .clearCookie("AccessToken", cookieOptions)
         .json({
-                success:true,
-                message:`User ${user.name} logout Successfully`,
-        })
+            success: true,
+            message: `User ${user.name} logout Successfully`
+        });
     }
     catch (error) {
         throw new ErrorHandler(501,error);
