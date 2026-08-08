@@ -33,6 +33,8 @@ export const verifyjwt = ErrorWrapper(async (req, res, next) => {
         const incomingAccessToken = req.cookies.AccessToken;
         const incomingRefreshToken = req.cookies.RefreshToken;
 
+        console.log(req.cookies);
+
         
         if (!incomingAccessToken || !incomingRefreshToken) {
             throw new ErrorHandler(

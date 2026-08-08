@@ -39,11 +39,18 @@ app.use(cookieParser());
 
 
 // Routing APIs
+// app.use('/auth',authRouter);
+// app.use("/employee", verifyjwt, employeeRouter);
+// app.use("/role", verifyjwt, roleRouter);
+// app.use("/awsProfile", verifyjwt, awsRouter);
+// app.use("/document", verifyjwt, documentRouter);
+
+
 app.use('/auth',authRouter);
-app.use("/employee", verifyjwt, employeeRouter);
-app.use("/role", verifyjwt, roleRouter);
-app.use("/awsProfile", verifyjwt, awsRouter);
-app.use("/document", verifyjwt, documentRouter);
+app.use("/employee", employeeRouter);
+app.use("/role", roleRouter);
+app.use("/awsProfile", awsRouter);
+app.use("/document", documentRouter);
 
 
 
