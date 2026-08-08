@@ -38,7 +38,7 @@ app.use(bodyParser.urlencoded({ extended: true, limit: "4kb" }));
 app.use(cookieParser());
 
 
-// Routing APIs
+// Routing APIs with JWT
 // app.use('/auth',authRouter);
 // app.use("/employee", verifyjwt, employeeRouter);
 // app.use("/role", verifyjwt, roleRouter);

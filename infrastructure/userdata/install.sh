@@ -37,7 +37,8 @@ apt-get install -y \
     jq \
     sudo \
     unzip \
-    curl
+    curl \
+    rsync
 
 # ------------------------------------
 # Start services
@@ -93,8 +94,9 @@ fi
 
 usermod -aG docker github-runner
 
-chown -R ubuntu:ubuntu /opt/blueboard
-chown -R github-runner:github-runner /home/github-runner
+# chown -R ubuntu:ubuntu /opt/blueboard
+# chown -R github-runner:github-runner /home/github-runner
+chown -R github-runner:github-runner /opt/blueboard
 
 # ------------------------------------
 # Download GitHub Actions Runner
