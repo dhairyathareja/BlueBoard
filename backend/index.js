@@ -45,7 +45,7 @@ app.use(cookieParser());
 // app.use("/awsProfile", verifyjwt, awsRouter);
 // app.use("/document", verifyjwt, documentRouter);
 
-
+// Backend w/o JWT
 app.use('/auth',authRouter);
 app.use("/employee", employeeRouter);
 app.use("/role", roleRouter);
