@@ -16,7 +16,9 @@ resource "aws_instance" "backend" {
 
   user_data_replace_on_change = true
 
-  user_data = file("${path.module}/userdata/install.sh")
+  user_data = templatefile("${path.module}/userdata/install.sh", {
+    cloudfront_domain = aws_cloudfront_distribution.frontend.domain_name
+  })
 
   tags = merge(
     local.common_tags,
