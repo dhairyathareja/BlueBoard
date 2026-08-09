@@ -4,6 +4,7 @@ const ErrorWrapper=function(cb){
             await cb(req,res,next)
         } 
         catch (error) {
+            console.log(error);
             res.status(error.statusCode).json({
                 status:error.statusCode,
                 message:error.message,
